@@ -22,7 +22,12 @@ export default function BookDetail() {
     setActiveImage(0)
     setQuantity(1)
     getBookDetail(id)
-      .then((r) => setBook(r.data.data))
+      .then((r) => {
+        const b = r.data.data
+        setBook(b)
+        const primaryIndex = b.images?.findIndex((img) => img.primary)
+        setActiveImage(primaryIndex > 0 ? primaryIndex : 0)
+      })
       .catch(() => setBook(null))
       .finally(() => setLoading(false))
     window.scrollTo({ top: 0 })

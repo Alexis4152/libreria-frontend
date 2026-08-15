@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   adminGetBook, adminCreateBook, adminUpdateBook,
-  adminAddBookImage, adminDeleteBookImage, adminSetPrimaryBookImage,
+  adminAddBookImage, adminDeleteBookImage, adminReorderBookImages,
 } from '../../api/books'
 import { getCategories, getAuthors, getPublishers } from '../../api/catalog'
 import { useNotify } from '../../context/NotifyContext'
@@ -125,12 +125,17 @@ export default function AdminBookForm() {
     }
   }
 
-  async function handleSetPrimary(imageId) {
+  async function handleMove(index, direction) {
+    const newIndex = index + direction
+    if (newIndex < 0 || newIndex >= images.length) return
+    const reordered = [...images]
+    const [moved] = reordered.splice(index, 1)
+    reordered.splice(newIndex, 0, moved)
     try {
-      await adminSetPrimaryBookImage(id, imageId)
-      setImages((prev) => prev.map((img) => ({ ...img, primary: img.id === imageId })))
+      const res = await adminReorderBookImages(id, reordered.map((img) => img.id))
+      setImages(res.data.data)
     } catch (err) {
-      notify(err.response?.data?.message || 'No se pudo marcar la imagen como principal', 'error')
+      notify(err.response?.data?.message || 'No se pudo reordenar las imagenes', 'error')
     }
   }
 
@@ -225,25 +230,44 @@ export default function AdminBookForm() {
       {isEdit && (
         <div className="card p-6 mt-6">
           <h2 className="font-semibold text-gray-900 mb-4">Imágenes</h2>
+          <p className="text-xs text-gray-500 mb-3">
+            El orden define cómo se ven al consultar el libro. La imagen #1 es siempre la principal.
+          </p>
           <div className="flex flex-wrap gap-3 mb-4">
-            {images.map((img) => (
+            {images.map((img, index) => (
               <div key={img.id} className="relative w-24 h-32 rounded-lg overflow-hidden border border-gray-200">
                 <img src={img.url} alt="" className="w-full h-full object-cover" />
-                {img.primary && <span className="absolute top-1 left-1 bg-primary-600 text-white text-[9px] px-1.5 rounded">Principal</span>}
+                <span
+                  className={`absolute top-1 left-1 text-white text-[9px] px-1.5 rounded ${
+                    index === 0 ? 'bg-primary-600' : 'bg-black/60'
+                  }`}
+                >
+                  {index === 0 ? 'Principal' : `#${index + 1}`}
+                </span>
                 <button
                   onClick={() => handleImageDelete(img.id)}
                   className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-5 h-5 text-xs leading-none"
                 >
                   ✕
                 </button>
-                {!img.primary && (
+                <div className="absolute bottom-0 inset-x-0 flex bg-black/60">
                   <button
-                    onClick={() => handleSetPrimary(img.id)}
-                    className="absolute bottom-0 inset-x-0 bg-black/60 text-white text-[10px] py-1"
+                    onClick={() => handleMove(index, -1)}
+                    disabled={index === 0}
+                    className="flex-1 text-white text-[11px] py-1 disabled:opacity-30 disabled:cursor-not-allowed"
+                    aria-label="Mover antes"
                   >
-                    Marcar principal
+                    ◀
                   </button>
-                )}
+                  <button
+                    onClick={() => handleMove(index, 1)}
+                    disabled={index === images.length - 1}
+                    className="flex-1 text-white text-[11px] py-1 disabled:opacity-30 disabled:cursor-not-allowed"
+                    aria-label="Mover despues"
+                  >
+                    ▶
+                  </button>
+                </div>
               </div>
             ))}
           </div>

@@ -19,4 +19,4 @@ export const adminAddBookImage = (id, file, primary) => {
   })
 }
 export const adminDeleteBookImage = (id, imageId) => api.delete(`/admin/books/${id}/images/${imageId}`)
-export const adminSetPrimaryBookImage = (id, imageId) => api.patch(`/admin/books/${id}/images/${imageId}/primary`)
+export const adminReorderBookImages = (id, imageIds) => api.put(`/admin/books/${id}/images/order`, { imageIds })
