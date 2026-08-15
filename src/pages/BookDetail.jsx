@@ -50,6 +50,7 @@ export default function BookDetail() {
     stock: book.stock,
     sku: book.sku,
     authorNames: book.authors?.map((a) => a.name).join(', '),
+    coverImageUrl: book.images?.find((img) => img.primary)?.url ?? book.images?.[0]?.url,
   }
 
   function handleAddToCart() {
@@ -75,8 +76,8 @@ export default function BookDetail() {
         <span className="text-gray-700 line-clamp-1">{book.title}</span>
       </nav>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div>
+      <div className="flex flex-col lg:flex-row gap-8">
+        <div className="w-full max-w-sm mx-auto lg:mx-0 lg:w-96 lg:shrink-0">
           <div className="relative aspect-[3/4] bg-gray-100 rounded-xl overflow-hidden group">
             <img
               src={book.images?.[activeImage]?.url}
@@ -122,7 +123,7 @@ export default function BookDetail() {
           )}
         </div>
 
-        <div>
+        <div className="flex-1 min-w-0">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{book.title}</h1>
           {book.subtitle && <p className="text-gray-500 mt-1">{book.subtitle}</p>}
           {book.authors?.length > 0 && (
