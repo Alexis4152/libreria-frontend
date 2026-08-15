@@ -19,8 +19,8 @@ export default function AdminOrders() {
   const [params, setParams] = useSearchParams()
   const statusFromUrl = params.get('status') || ''
 
-  const [filters, setFilters] = useState({ q: '', status: statusFromUrl })
-  const [appliedFilters, setAppliedFilters] = useState({ q: '', status: statusFromUrl })
+  const [filters, setFilters] = useState({ q: '', status: statusFromUrl, dateFrom: '', dateTo: '' })
+  const [appliedFilters, setAppliedFilters] = useState({ q: '', status: statusFromUrl, dateFrom: '', dateTo: '' })
   const [page, setPage] = useState(0)
   const [size, setSize] = useState(20)
   const [result, setResult] = useState({ content: [], page: 0, totalPages: 0, totalElements: 0 })
@@ -31,6 +31,8 @@ export default function AdminOrders() {
     adminListOrders({
       status: appliedFilters.status || undefined,
       q: appliedFilters.q || undefined,
+      dateFrom: appliedFilters.dateFrom || undefined,
+      dateTo: appliedFilters.dateTo || undefined,
       page, size,
     }).then((r) => setResult(r.data.data)).finally(() => setLoading(false))
   }
@@ -45,7 +47,7 @@ export default function AdminOrders() {
   }
 
   function handleClearFilters() {
-    const empty = { q: '', status: '' }
+    const empty = { q: '', status: '', dateFrom: '', dateTo: '' }
     setFilters(empty)
     setAppliedFilters(empty)
     setPage(0)
@@ -67,6 +69,16 @@ export default function AdminOrders() {
           <select className="input" value={filters.status} onChange={(e) => setFilters({ ...filters, status: e.target.value })}>
             {STATUSES.map((s) => <option key={s} value={s}>{s || 'Todos los estados'}</option>)}
           </select>
+        </div>
+        <div className="min-w-[150px]">
+          <label className="text-xs font-medium text-gray-600 block mb-1">Fecha inicio</label>
+          <input type="date" className="input" value={filters.dateFrom}
+            onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })} />
+        </div>
+        <div className="min-w-[150px]">
+          <label className="text-xs font-medium text-gray-600 block mb-1">Fecha fin</label>
+          <input type="date" className="input" value={filters.dateTo} min={filters.dateFrom || undefined}
+            onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })} />
         </div>
         <div className="flex gap-2">
           <button type="submit" className="btn-primary text-sm">Filtrar</button>

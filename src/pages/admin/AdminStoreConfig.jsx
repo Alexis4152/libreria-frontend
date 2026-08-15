@@ -94,7 +94,7 @@ export default function AdminStoreConfig() {
     <div className="max-w-3xl">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Configuración de la tienda</h1>
 
-      <EmailConfigCard />
+      {/* EmailConfigCard oculta hasta rol super admin, ver AdminStoreConfig.jsx */}
 
       <div className="card p-6 mb-6">
         <h2 className="font-semibold text-gray-900 mb-4">Logo y favicon</h2>
