@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   adminGetBook, adminCreateBook, adminUpdateBook,
-  adminAddBookImage, adminDeleteBookImage,
+  adminAddBookImage, adminDeleteBookImage, adminSetPrimaryBookImage,
 } from '../../api/books'
 import { getCategories, getAuthors, getPublishers } from '../../api/catalog'
 import { useNotify } from '../../context/NotifyContext'
@@ -125,6 +125,15 @@ export default function AdminBookForm() {
     }
   }
 
+  async function handleSetPrimary(imageId) {
+    try {
+      await adminSetPrimaryBookImage(id, imageId)
+      setImages((prev) => prev.map((img) => ({ ...img, primary: img.id === imageId })))
+    } catch (err) {
+      notify(err.response?.data?.message || 'No se pudo marcar la imagen como principal', 'error')
+    }
+  }
+
   if (loading) return <p className="text-gray-500">Cargando...</p>
 
   return (
@@ -227,6 +236,14 @@ export default function AdminBookForm() {
                 >
                   ✕
                 </button>
+                {!img.primary && (
+                  <button
+                    onClick={() => handleSetPrimary(img.id)}
+                    className="absolute bottom-0 inset-x-0 bg-black/60 text-white text-[10px] py-1"
+                  >
+                    Marcar principal
+                  </button>
+                )}
               </div>
             ))}
           </div>

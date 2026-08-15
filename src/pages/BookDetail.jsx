@@ -77,12 +77,35 @@ export default function BookDetail() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
-          <div className="aspect-[3/4] bg-gray-100 rounded-xl overflow-hidden">
+          <div className="relative aspect-[3/4] bg-gray-100 rounded-xl overflow-hidden group">
             <img
               src={book.images?.[activeImage]?.url}
               alt={book.title}
               className="w-full h-full object-cover"
             />
+            {book.images?.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  aria-label="Imagen anterior"
+                  onClick={() => setActiveImage((i) => (i - 1 + book.images.length) % book.images.length)}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-9 h-9 rounded-full bg-white/80 text-gray-700 text-xl leading-none shadow hover:bg-white opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  ‹
+                </button>
+                <button
+                  type="button"
+                  aria-label="Imagen siguiente"
+                  onClick={() => setActiveImage((i) => (i + 1) % book.images.length)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-9 h-9 rounded-full bg-white/80 text-gray-700 text-xl leading-none shadow hover:bg-white opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  ›
+                </button>
+                <span className="absolute bottom-2 right-2 text-xs font-medium px-2 py-0.5 rounded-full bg-black/50 text-white">
+                  {activeImage + 1} / {book.images.length}
+                </span>
+              </>
+            )}
           </div>
           {book.images?.length > 1 && (
             <div className="flex gap-2 mt-3 overflow-x-auto">
